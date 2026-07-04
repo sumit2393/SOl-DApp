@@ -20,10 +20,18 @@ export async function getBalance(
   publicKey: string,
   network: NetworkType
 ): Promise<number> {
+    try{
   const connection = getConnection(network);
   const pubKey = new PublicKey(publicKey);
   const balance = await connection.getBalance(pubKey);
   return balance / LAMPORTS_PER_SOL; // lamports to SOL convert
+} catch (error) {
+    // Fallback to public RPC
+    const fallback = new Connection('https://api.devnet.solana.com', 'confirmed');
+    const pubKey = new PublicKey(publicKey);
+    const balance = await fallback.getBalance(pubKey);
+    return balance / LAMPORTS_PER_SOL;
+  }
 }
 
 // Transfer SOL from one account to another

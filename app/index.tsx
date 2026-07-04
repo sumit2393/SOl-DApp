@@ -1,92 +1,32 @@
-import { StyleSheet, Text, View, TouchableOpacity } from 'react-native'
+import { useEffect } from 'react'
+import { View, ActivityIndicator } from 'react-native'
 import { useRouter } from 'expo-router'
-import { colors, spacing, borderRadius, typography } from '../constants/theme'
+import { walletExist, getPublicKey } from '../services/secureStorageServices'
+import { userWalletStore } from '../store/useWalletStore'
+import { colors } from '../constants/theme'
 
-export default function WelcomeScreen() {
+export default function SplashScreen() {
   const router = useRouter()
+  const { setPublicKey } = userWalletStore()
+
+  useEffect(() => {
+    checkWallet()
+  }, [])
+
+  async function checkWallet() {
+    const exists = await walletExist()
+    if (exists) {
+      const publicKey = await getPublicKey()
+      if (publicKey) setPublicKey(publicKey)
+      router.replace('/wallet/dashboard' as any)
+    } else {
+      router.replace('/onboarding/welcome' as any)
+    }
+  }
 
   return (
-    <View style={styles.container}>
-
-      {/* Hero Section */}
-      <View style={styles.hero}>
-        <Text style={styles.logo}>◎</Text>
-        <Text style={styles.title}>Solana Wallet</Text>
-        <Text style={styles.subtitle}>Secure. Fast. Decentralized.</Text>
-      </View>
-
-      {/* Buttons */}
-      <View style={styles.buttons}>
-        <TouchableOpacity
-          style={styles.primaryBtn}
-          onPress={() => router.push('/onboarding/create-wallet')}
-        >
-          <Text style={styles.primaryBtnText}>Create New Wallet</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={styles.secondaryBtn}
-          onPress={() => router.push('/onboarding/import-wallet')}
-        >
-          <Text style={styles.secondaryBtnText}>Import Existing Wallet</Text>
-        </TouchableOpacity>
-      </View>
-
+    <View style={{ flex: 1, backgroundColor: colors.background, justifyContent: 'center', alignItems: 'center' }}>
+      <ActivityIndicator color={colors.primary} size="large" />
     </View>
   )
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-    justifyContent: 'space-between',
-    paddingHorizontal: spacing.xl,
-    paddingTop: 120,
-    paddingBottom: spacing.xxl,
-  },
-  hero: {
-    alignItems: 'center',
-    gap: spacing.md,
-  },
-  logo: {
-    fontSize: 80,
-    color: colors.primary,
-  },
-  title: {
-    ...typography.h1,
-    color: colors.text,
-  },
-  subtitle: {
-    ...typography.body,
-    color: colors.textMuted,
-    textAlign: 'center',
-  },
-  buttons: {
-    gap: spacing.md,
-  },
-  primaryBtn: {
-    backgroundColor: colors.primary,
-    padding: spacing.md,
-    borderRadius: borderRadius.lg,
-    alignItems: 'center',
-  },
-  primaryBtnText: {
-    ...typography.body,
-    color: colors.text,
-    fontWeight: '700',
-  },
-  secondaryBtn: {
-    backgroundColor: colors.card,
-    padding: spacing.md,
-    borderRadius: borderRadius.lg,
-    alignItems: 'center',
-    borderWidth: 2,
-    borderColor: colors.border,
-  },
-  secondaryBtnText: {
-    ...typography.body,
-    color: colors.primary,
-    fontWeight: '600',
-  },
-})

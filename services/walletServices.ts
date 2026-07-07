@@ -4,7 +4,7 @@ import { Keypair } from '@solana/web3.js';
 import { Buffer as BufferPolyfill } from 'buffer';
 import { WalletData } from '../models/wallet';
 
-//new wallet genrate 
+// Generate a new wallet with random mnemonic
 export function generateWallet(): WalletData {
   const mnemonic = bip39.generateMnemonic(128); // 12 words
   return mnemonicToWallet(mnemonic);
@@ -27,12 +27,12 @@ export function mnemonicToWallet(mnemonic: string): WalletData {
   };
 }
 
-//validate mnemonic
+// Validate mnemonic phrase
 export function isValidMnemonic(mnemonic: string): boolean {
   return bip39.validateMnemonic(mnemonic.trim().toLowerCase());
 }
 
-// base64 to keypair and Transaction signing
+// Convert base64 secret key to Keypair and sign transactions
 export function getKeypairFromSecret(secretKeyBase64: string): Keypair {
   const secretKey = BufferPolyfill.from(secretKeyBase64, 'base64');
   return Keypair.fromSecretKey(secretKey);

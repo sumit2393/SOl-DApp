@@ -14,7 +14,7 @@ export default function ConfirmSeedScreen() {
 
       <TouchableOpacity
         style={styles.primaryBtn}
-        onPress={() => router.push('/wallet/dashboard' as any)}
+        onPress={() => router.push('/(c s)/dashboard' as any)}
       >
         <Text style={styles.primaryBtnText}>Continue to Dashboard</Text>
       </TouchableOpacity>

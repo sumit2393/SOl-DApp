@@ -24,7 +24,7 @@ export async function getBalance(
   const connection = getConnection(network);
   const pubKey = new PublicKey(publicKey);
   const balance = await connection.getBalance(pubKey);
-  return balance / LAMPORTS_PER_SOL; // lamports to SOL convert
+  return balance / LAMPORTS_PER_SOL; // Convert lamports to SOL
 } catch (error) {
     // Fallback to public RPC
     const fallback = new Connection('https://api.devnet.solana.com', 'confirmed');

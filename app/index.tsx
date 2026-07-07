@@ -18,7 +18,7 @@ export default function SplashScreen() {
     if (exists) {
       const publicKey = await getPublicKey()
       if (publicKey) setPublicKey(publicKey)
-      router.replace('/wallet/dashboard' as any)
+      router.replace('/(wallet)/dashboard' as any)
     } else {
       router.replace('/onboarding/welcome' as any)
     }

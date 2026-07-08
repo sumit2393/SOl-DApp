@@ -5,8 +5,11 @@ import {
   TouchableOpacity,
   Alert,
   Share,
+  useWindowDimensions,
+  Platform,
 } from "react-native";
 import * as Clipboard from "expo-clipboard";
+import { Ionicons } from '@expo/vector-icons'
 import { useRouter } from "expo-router";
 import QRCode from "react-native-qrcode-svg";
 import {
@@ -20,6 +23,9 @@ import { userWalletStore } from "../../store/useWalletStore";
 export default function ReceiveScreen() {
   const router = useRouter();
   const { publicKey } = userWalletStore();
+  const { width, height } = useWindowDimensions();
+  const isCompact = width < 380 || height < 700;
+  const qrSize = Math.min(width * 0.7, 240);
 
   async function handleCopy() {
     if (!publicKey) return;
@@ -33,11 +39,24 @@ export default function ReceiveScreen() {
       message: "My solana wallet address: " + publicKey,
     });
   }
+  const containerStyle = {
+    padding: isCompact ? spacing.lg : spacing.xl,
+    paddingTop: Platform.OS === 'ios' ? 54 : 24,
+  }
+
+  const qrBoxStyle = {
+    padding: isCompact ? spacing.md : spacing.lg,
+  }
+
+  const addressContainerStyle = {
+    marginLeft: isCompact ? spacing.sm : spacing.md,
+  }
+
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, containerStyle]}>
       <View style={styles.header}>
         <TouchableOpacity style={styles.backBtn} onPress={() => router.back()}>
-          <Text style={{ color: colors.primary, fontSize: 20 }}>←</Text>
+          <Ionicons name="arrow-back" size={22} color={colors.primary} />
         </TouchableOpacity>
 
         <Text style={styles.headerTitle}>Receive SOL</Text>
@@ -45,30 +64,32 @@ export default function ReceiveScreen() {
       </View>
 
       <View style={styles.qrContainer}>
-        <View style={styles.qrBox}>
+        <View style={[styles.qrBox, qrBoxStyle]}>
           {publicKey && (
             <QRCode
               value={publicKey}
-              size={220}
+              size={qrSize}
               color="#000000"
-              backgroundColor='"#ffffff'
+              backgroundColor="#ffffff"
             ></QRCode>
           )}
         </View>
         <Text style={styles.scanText}>Scan to receive SOL</Text>
       </View>
       {/*Address */}
-      <View style ={styles.addressContainer}>
+      <View style={[styles.addressContainer, addressContainerStyle]}>
         <Text style={styles.addressLabel}>Your Wallet Address</Text>
         <View style={styles.addressBox}>
             <Text style={styles.addressText}numberOfLines={2}>{publicKey}</Text>
         </View>
  {/*buttons */}
- <View style={styles.buttons}>
+ <View style={[styles.buttons, isCompact && styles.buttonsCompact]}>
     <TouchableOpacity style={styles.copyBtn} onPress={handleCopy}>
+      <Ionicons name="copy-outline" size={20} color="#ffffff" />
       <Text style={styles.copyBtnText}>Copy Address</Text>
     </TouchableOpacity>
     <TouchableOpacity style={styles.copyBtn} onPress={handleShare}>
+      <Ionicons name="share-social-outline" size={20} color="#ffffff" />
       <Text style={styles.copyBtnText}>Share Address</Text>
     </TouchableOpacity>
   </View>
@@ -87,8 +108,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.background,
-    padding: spacing.xl,
-    paddingTop: 60,
   },
   title: {
     ...typography.h1,
@@ -104,8 +123,10 @@ const styles = StyleSheet.create({
     backgroundColor: colors.card,
     padding: spacing.sm,
     borderRadius: borderRadius.md,
-    width: 40,
+    width: 44,
+    height: 44,
     alignItems: "center",
+    justifyContent: "center",
   },
   backText: {
     fontSize: 20,
@@ -122,7 +143,6 @@ const styles = StyleSheet.create({
   },
   qrBox: {
     backgroundColor: "#ffffff",
-    padding: spacing.lg,
     borderRadius: borderRadius.xl,
   },
   scanText: {
@@ -131,7 +151,6 @@ const styles = StyleSheet.create({
   },
   addressContainer: {
     marginBottom: spacing.lg,
-    marginLeft: spacing.md,
   },
     addressBox: {
     backgroundColor: colors.card,
@@ -151,12 +170,20 @@ const styles = StyleSheet.create({
     marginBottom: spacing.lg,
     marginTop: spacing.md,
   },
+  buttonsCompact: {
+    flexDirection: 'column',
+  },
   copyBtn: {
     flex: 1,
     backgroundColor: colors.primary,
-    padding: spacing.md,
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.md,
     borderRadius: borderRadius.md,
     alignItems: 'center',
+    justifyContent: 'center',
+    flexDirection: 'row',
+    gap: spacing.sm,
+    minHeight: 48,
   },
    copyBtnText: {
     ...typography.body,

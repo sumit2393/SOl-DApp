@@ -19,7 +19,7 @@ export default function ActivityScreen() {
   const store = userWalletStore()
   const { publicKey } = store
   const { transactions, isLoading, error, fetchTransactions, clearHistory } =
-    useTransactionHistory(publicKey)
+    useTransactionHistory(publicKey??"")
   const [refreshing, setRefreshing] = useState(false)
 
   const onRefresh = async () => {

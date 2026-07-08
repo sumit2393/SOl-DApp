@@ -7,8 +7,10 @@ import {
   RefreshControl,
   ScrollView,
   Alert,
+  useWindowDimensions,
 } from 'react-native'
 import * as Clipboard from 'expo-clipboard'
+import { Ionicons } from '@expo/vector-icons'
 import { useRouter } from 'expo-router'
 import { JSXElementConstructor, Key, ReactElement, ReactNode, ReactPortal, useEffect } from 'react'
 import { colors, spacing, borderRadius, typography } from '../../constants/theme'
@@ -27,6 +29,8 @@ export default function DashboardScreen() {
   const { balance, isLoading, fetchBalance } = useBalance(publicKey)
   const { price } = useSOLPrice()
   const { prices } = useTopPrices()
+  const { width } = useWindowDimensions()
+  const isCompact = width < 380
 
   const usdValue = price ? (balance * price.price).toFixed(2) : '0.00'
 
@@ -119,33 +123,33 @@ export default function DashboardScreen() {
           <Text style={styles.publicKey} numberOfLines={1} ellipsizeMode="middle">
             {publicKey}
           </Text>
-          <Text style={styles.copyIcon}>⎘</Text>
+          <Ionicons name="copy-outline" size={isCompact ? 17 : 18} color={colors.primary} />
         </TouchableOpacity>
       </View>
 
       {/* Quick Actions */}
-      <View style={styles.actions}>
+      <View style={[styles.actions, isCompact && styles.actionsCompact]}>
         <TouchableOpacity
-          style={styles.actionBtn}
+          style={[styles.actionBtn, isCompact && styles.actionBtnCompact]}
           onPress={() => router.push('/(wallet)/send' as any)}
         >
-          <Text style={styles.actionIcon}>↑</Text>
+          <Ionicons name="send-outline" size={isCompact ? 24 : 26} color={colors.primary} />
           <Text style={styles.actionText}>Send</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
-          style={styles.actionBtn}
+          style={[styles.actionBtn, isCompact && styles.actionBtnCompact]}
           onPress={() => router.push('/(wallet)/receive' as any)}
         >
-          <Text style={styles.actionIcon}>↓</Text>
+          <Ionicons name="download-outline" size={isCompact ? 24 : 26} color={colors.primary} />
           <Text style={styles.actionText}>Receive</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
-          style={styles.actionBtn}
+          style={[styles.actionBtn, isCompact && styles.actionBtnCompact]}
           onPress={() => router.push('/(wallet)/settings' as any)}
         >
-          <Text style={styles.actionIcon}>⚙</Text>
+          <Ionicons name="settings-outline" size={isCompact ? 24 : 26} color={colors.primary} />
           <Text style={styles.actionText}>Settings</Text>
         </TouchableOpacity>
       </View>
@@ -275,29 +279,30 @@ const styles = StyleSheet.create({
     color: colors.textMuted,
     flex: 1,
   },
-  copyIcon: {
-    fontSize: 16,
-    color: colors.primary,
-  },
   actions: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     paddingHorizontal: spacing.xl,
     gap: spacing.sm,
   },
+  actionsCompact: {
+    paddingHorizontal: spacing.lg,
+  },
   actionBtn: {
     flex: 1,
     backgroundColor: colors.card,
-    padding: spacing.md,
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.md,
     borderRadius: borderRadius.lg,
     alignItems: 'center',
     gap: spacing.xs,
+    minHeight: 104,
     borderWidth: 1,
     borderColor: colors.border,
   },
-  actionIcon: {
-    fontSize: 24,
-    color: colors.primary,
+  actionBtnCompact: {
+    paddingVertical: spacing.sm,
+    minHeight: 96,
   },
   actionText: {
     ...typography.tiny,
